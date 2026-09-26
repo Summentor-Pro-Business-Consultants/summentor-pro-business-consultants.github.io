@@ -1,0 +1,616 @@
+1:"$Sreact.fragment"
+2:I[32035,["/_next/static/chunks/08yb0vyff6txf.js","/_next/static/chunks/0nz2qlxv3r.27.js"],"default"]
+3:I[91168,["/_next/static/chunks/08yb0vyff6txf.js","/_next/static/chunks/0nz2qlxv3r.27.js"],"default"]
+b:I[75115,["/_next/static/chunks/08yb0vyff6txf.js","/_next/static/chunks/0nz2qlxv3r.27.js"],"default",1]
+:HL["/_next/static/chunks/0u5cax1bxn2qo.css","style"]
+:HL["/_next/static/chunks/0y6gg2mgd4t0h.css","style"]
+:HL["/_next/static/media/21ca8f3f56c22ca2-s.p.0fmzj955937qe.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+4:T6d34,
+        /*
+          RESET AGAINST THE MAIN SITE'S GLOBALS.
+          app/globals.css styles bare elements for summentorpro.com — and
+          styles headings with "font-family: ... !important", which silently
+          overrode Archivo across this entire microsite. It also paints
+          headings, paragraphs and links in the main site's navy-and-gold.
+          Those rules are correct for that site and wrong for this one; the
+          two share a document because the microsite is a route group inside
+          it. Re-asserting inherit here scopes the main site's typography to
+          the main site. Specificity does the work — .msme-root h1 beats h1 —
+          except for font-family, where !important has to be answered in kind.
+        */
+        .msme-root h1, .msme-root h2, .msme-root h3,
+        .msme-root h4, .msme-root h5, .msme-root h6 {
+          font-family: inherit !important;
+          color: inherit;
+          font-weight: inherit;
+          line-height: inherit;
+          letter-spacing: inherit;
+          text-transform: none;
+          margin: 0;
+        }
+        .msme-root p, .msme-root li, .msme-root blockquote, .msme-root span {
+          color: inherit;
+          font-size: inherit;
+          font-weight: inherit;
+          line-height: inherit;
+        }
+        .msme-root a {
+          color: inherit;
+          text-decoration: none;
+        }
+
+        /*
+          EXACT COLUMN COUNTS.
+          The comp is a fixed 2565px canvas, so its grids have a definite
+          number of columns — three At a Glance tiles per row, two format
+          tiles, five Why Partner cards. "auto-fit" guesses that number from
+          the available width and got it wrong (four across, clipping a
+          title), so the counts are declared here and only collapse at the
+          widths where the content genuinely stops fitting.
+        */
+        .msme-cols-2 { display: grid; grid-template-columns: var(--cols, repeat(2, minmax(0, 1fr))); }
+        .msme-cols-3 { display: grid; grid-template-columns: var(--cols, repeat(3, minmax(0, 1fr))); }
+        .msme-cols-4 { display: grid; grid-template-columns: var(--cols, repeat(4, minmax(0, 1fr))); }
+        .msme-cols-5 { display: grid; grid-template-columns: var(--cols, repeat(5, minmax(0, 1fr))); }
+
+        @media (max-width: 1040px) {
+          .msme-cols-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+          .msme-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 880px) {
+          .msme-cols-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 640px) {
+          .msme-cols-2,
+          .msme-cols-3,
+          .msme-cols-4,
+          .msme-cols-5 { grid-template-columns: minmax(0, 1fr); }
+        }
+
+        /*
+          THE ARTBOARD UNIT.
+          The design is one 2565px-wide artboard measured in its own pixels.
+          --u is a single artboard pixel expressed in viewport width, so
+          calc(90 * var(--u)) is the 90px eyebrow at any window size (see
+          u() in components/msme/tokens.ts). Desktop scales 1:1 with the
+          artboard. Below it the divisor shrinks, which makes everything
+          proportionally LARGER relative to the screen - the comp's
+          2565px-wide proportions would otherwise render a phone's type at
+          a third of a legible size.
+        */
+        .msme-root { --u: calc(100vw / 2565); }
+        @media (max-width: 1040px) { .msme-root { --u: calc(100vw / 2100); } }
+        @media (max-width: 640px)  { .msme-root { --u: calc(100vw / 1750); } }
+
+        /* The comp's 2074px content measure; ordinary gutters on small screens. */
+        .msme-container {
+          width: calc(2074 * var(--u));
+          margin-left: auto;
+          margin-right: auto;
+        }
+        @media (max-width: 1040px) {
+          .msme-container {
+            width: auto;
+            margin-left: clamp(20px, 5vw, 40px);
+            margin-right: clamp(20px, 5vw, 40px);
+          }
+        }
+
+        /*
+          DESKTOP LINE BREAKS.
+          The comp wraps its paragraphs at specific words. Real text metrics
+          differ from Photoshop's by ~1%, which is enough to move a break, so
+          the comp's breaks are written into the copy as <br className="msme-br">
+          and honoured only where the layout is the comp's. Below that the
+          text reflows normally. "msme-nowrap-lg" does the same for lines the
+          comp keeps whole.
+        */
+        .msme-br { display: none; }
+        @media (min-width: 1041px) {
+          .msme-br { display: inline; }
+          .msme-nowrap-lg { white-space: nowrap; }
+        }
+
+        /*
+          PHONE AND TABLET SAFETY NETS.
+          The desktop layout leans on the comp's fixed widths. Below the
+          desktop breakpoint those widths no longer fit, so anything that would
+          otherwise run past the edge is told it may shrink and wrap.
+        */
+        @media (max-width: 1040px) {
+          .msme-root [class*="msme-cols-"] > * { min-width: 0; }
+          .msme-photo-pair { grid-template-columns: 1fr 1fr !important; }
+          /* Two-column blocks built on the comp's fixed widths stack on a tablet
+             rather than squeeze — their text columns are too wide to share a row. */
+          .msme-cols-2 { grid-template-columns: minmax(0, 1fr) !important; }
+          .msme-chiprow > * { width: auto !important; }
+          .msme-root [style*="nowrap"] { white-space: normal !important; }
+        }
+        @media (max-width: 640px) {
+          .msme-photo-pair { grid-template-columns: 1fr !important; }
+          .msme-root [class*="msme-cols-"] > * { max-width: 100%; }
+        }
+
+        /* Conversation cards: on a phone they stack, and grow with their text
+           rather than holding the comp's aspect ratio, which crams the copy. */
+        @media (max-width: 1040px) {
+          .msme-conv-row { grid-template-columns: 1fr !important; }
+          .msme-conv-card { aspect-ratio: auto !important; min-height: 320px; }
+          .msme-conv-card p { max-width: none !important; }
+        }
+
+        /* Chip rows: the comp lets them run past the column, so they don't wrap
+           on desktop; on a smaller screen they do. */
+        .msme-chiprow { display: flex; flex-wrap: nowrap; }
+        @media (max-width: 1040px) { .msme-chiprow { flex-wrap: wrap; } }
+
+        /* At a Glance tiles: hand-placed at desktop width, flowed on a phone. */
+        @media (max-width: 640px) {
+          .msme-glance-tile {
+            aspect-ratio: auto !important;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            padding: 24px 22px 26px;
+          }
+          .msme-glance-tile > * {
+            position: static !important;
+            white-space: normal !important;
+          }
+          .msme-glance-tile .msme-br { display: none; }
+        }
+
+        /* Who Will Be in the Room: a hand-placed board at desktop width, a plain
+           list on a phone. */
+        @media (max-width: 640px) {
+          .msme-who-board { height: auto !important; width: auto !important; margin-left: 0 !important; }
+          .msme-who-rule { display: none; }
+          .msme-who-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid #000;
+          }
+          .msme-who-item > span { position: static !important; }
+          .msme-who-text { white-space: normal !important; }
+        }
+
+        /* Format tiles: hand-placed text at desktop width, stacked on a phone. */
+        @media (max-width: 640px) {
+          .msme-format-tile {
+            aspect-ratio: auto !important;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 10px;
+            min-height: 220px;
+            padding: 24px 22px;
+          }
+          .msme-format-title, .msme-format-copy { position: relative !important; left: auto !important; top: auto !important; white-space: normal !important; }
+        }
+
+        /* B2B Connect: a fixed board at desktop width, a stack on a phone. */
+        @media (max-width: 640px) {
+          .msme-b2b { height: auto !important; padding: 56px 20px 64px; }
+          .msme-b2b-flow { display: flex; flex-direction: column; gap: 28px; position: relative !important; }
+          .msme-b2b-abs { position: static !important; width: auto !important; white-space: normal !important; }
+          .msme-b2b-abs > p { position: static !important; margin-bottom: 10px !important; }
+          .msme-b2b-deco { display: none; }
+        }
+
+        /* Innovation Showcase chips: a fixed board at desktop width, wrapping chips on a phone. */
+        @media (max-width: 640px) {
+          .msme-show-board { height: auto !important; display: flex; flex-wrap: wrap; gap: 10px; }
+          .msme-show-lead { position: static !important; width: 100%; margin-bottom: 6px !important; }
+          .msme-show-chip {
+            position: relative !important;
+            left: auto !important;
+            top: auto !important;
+            width: auto !important;
+            height: auto !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+          }
+          .msme-show-chip > span { position: static !important; }
+          .msme-show-label { white-space: normal !important; }
+        }
+
+        /* Attend / Partner panels and the Why Partner strip: boards at desktop width, a flow on a phone. */
+        @media (max-width: 640px) {
+          .msme-ap-panel {
+            height: auto !important;
+            margin-left: 0 !important;
+            padding: 36px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+          }
+          .msme-ap-panel > * { position: static !important; }
+          .msme-ap-panel .msme-ap-item { position: relative; }
+          .msme-ap-panel .msme-ap-item > * { position: static !important; }
+          .msme-ap-list { display: grid; gap: 10px; }
+          .msme-ap-item { display: flex; align-items: center; gap: 12px; }
+          .msme-ap-rule { display: none; }
+          .msme-ap-copy, .msme-ap-sub { white-space: normal !important; }
+          .msme-wp-strip { margin-left: 0 !important; }
+          .msme-wp-card { height: auto !important; padding: 24px 22px 28px; border-left: none !important; border-top: 1px solid #CBC5BC; }
+          .msme-wp-card > * { position: static !important; }
+          .msme-wp-card .msme-wp-icon { display: block; margin-bottom: 12px; }
+          .msme-wp-title { white-space: normal !important; margin: 0 0 8px !important; }
+        }
+
+        /* Why Attend grid: a hand-placed board at desktop width, a plain list on a phone. */
+        @media (max-width: 640px) {
+          .msme-wa-grid { height: auto !important; background: #FFEFE6 !important; padding: 8px 20px; }
+          .msme-wa-cell {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 0;
+            border-bottom: 1px solid #DCD0C6;
+          }
+          .msme-wa-cell > span { position: static !important; }
+          .msme-wa-text { white-space: normal !important; }
+        }
+
+        /* Growth cards: a hand-placed board at desktop width, stacked cards on a phone. */
+        @media (max-width: 640px) {
+          .msme-growth-board { height: auto !important; margin-left: 0 !important; display: grid; gap: 16px; }
+          .msme-growth-card {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 22px 22px;
+            border: 3px solid #000;
+            border-radius: 12px;
+          }
+          .msme-growth-frame { display: none; }
+          .msme-growth-card > p, .msme-growth-card > span { position: static !important; white-space: normal !important; }
+        }
+
+        /* Conversation cards: hand-placed text at desktop width, a stack on a phone. */
+        @media (max-width: 640px) {
+          .msme-conv-card {
+            aspect-ratio: auto !important;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            gap: 10px;
+            min-height: 300px;
+            padding: 120px 22px 26px;
+          }
+          .msme-conv-abs { position: relative !important; left: auto !important; top: auto !important; white-space: normal !important; max-width: none !important; }
+        }
+
+        /* Generic hand-placed boards (see Board/Abs in Primitives.tsx): a stack on a phone. */
+        @media (max-width: 640px) {
+          .msme-board { height: auto !important; display: flex; flex-direction: column; gap: 22px; }
+          .msme-abs { position: static !important; width: auto !important; white-space: normal !important; }
+          .msme-abs img, .msme-abs .msme-fit { max-width: 100%; }
+          .msme-deco { display: none !important; }
+        }
+
+        @media (prefers-reduced-motion: reduce) { .msme-hero-video { display: none; } }
+
+        /*
+          Past partners: a marquee rather than one static grid of all 36 marks at once -
+          the full list duplicated once and scrolled left on a continuous loop, so
+          translateX(-50%) always lands exactly on the seam between the two copies,
+          whatever the actual pixel width of the row turns out to be. A soft mask fades
+          each edge rather than hard-clipping a logo mid-mark. Paused on hover so a mark
+          can actually be read, and, since it never stops on its own otherwise, switched
+          off entirely under reduced motion - the duplicated second copy is aria-hidden,
+          so a static first pass still shows the whole list with nothing missing.
+        */
+        .msme-partner-marquee {
+          overflow: hidden;
+          -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+        }
+        .msme-partner-track {
+          display: flex;
+          width: max-content;
+          animation: msme-partner-marquee 50s linear infinite;
+        }
+        @keyframes msme-partner-marquee {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+        @media (hover: hover) and (pointer: fine) {
+          .msme-partner-marquee:hover .msme-partner-track { animation-play-state: paused; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .msme-partner-track { animation: none !important; }
+        }
+
+        /*
+          Past Editions: a justified photo gallery. Each row is a flex container at a fixed
+          height; every tile's own flex-grow (set inline, proportional to its photo's aspect
+          ratio) grows it to fill the row. On hover, the rest of the row (and the other rows,
+          via the gallery-level selector) dims and desaturates while the hovered photo lifts
+          forward in full colour - skipped on touch, where there is no hover to trigger it.
+          Below 640px each row stacks into single-column tiles at their own aspect ratio.
+        */
+        .msme-pe-row { display: flex; }
+        .msme-pe-tile { position: relative; overflow: hidden; }
+        .msme-pe-tile img { transition: filter 0.3s ease, transform 0.3s ease; }
+        @media (hover: hover) and (pointer: fine) {
+          .msme-pe-gallery:hover .msme-pe-tile:not(:hover) img {
+            filter: grayscale(1) brightness(0.6);
+          }
+          .msme-pe-tile:hover { z-index: 2; }
+          .msme-pe-tile:hover img { transform: scale(1.06); }
+        }
+        @media (max-width: 640px) {
+          .msme-pe-row { flex-direction: column; height: auto !important; }
+          .msme-pe-tile { flex: none !important; width: 100%; height: auto !important; aspect-ratio: var(--pe-ar); }
+        }
+
+        /* Footer: a hand-placed board at desktop width, a stack on a phone. */
+        @media (max-width: 880px) {
+          .msme-footer-board {
+            height: auto !important;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            padding: 44px 0 40px;
+          }
+          .msme-footer-abs, .msme-footer-rule { position: static !important; white-space: normal !important; }
+          .msme-footer-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; }
+          .msme-footer-nav a { position: static !important; }
+          .msme-footer-rule { width: 100% !important; }
+        }
+
+        .msme-btn:focus-visible,
+        a:focus-visible,
+        button:focus-visible,
+        summary:focus-visible,
+        [tabindex]:focus-visible {
+          outline: 2px solid #FB4E05;
+          outline-offset: 3px;
+          border-radius: 4px;
+        }
+        /* Formats tiles and Five Conversations cards: true black-and-white at rest, not
+           just a dark tint - a tint alone still reads warm on a naturally warm-lit
+           photo (the factory floor behind "Technology", the stage lighting behind
+           "Government & Industry Dialogue"), which is exactly the standing-colour look
+           the hover rules below exist to remove. Unconditional (outside the hover query
+           below) so a touch device, which never triggers the hover rules that would
+           otherwise remove it, still gets a correct black-and-white resting state
+           rather than the plain colour photo. */
+        .msme-format-tile img,
+        .msme-conv-card img { filter: grayscale(1); }
+
+        /*
+          A CONSISTENT HOVER LANGUAGE — "NOTHING STANDS OUT UNTIL YOU TOUCH IT".
+          Several places in the comp highlight one item in a set with the brand orange —
+          a growth-story card, a focus chip, an innovation-showcase chip, a formats tile,
+          a five-conversations card, an about-page connect chip, a "why nominate" card,
+          the Register button — while its siblings stay neutral. First pass: every sibling
+          got that same orange treatment on hover too. Second pass, this block: the ONE
+          the designer pre-picked stopped being orange at rest as well, so nothing on the
+          page carries a standing colour fill that isn't there because of an interaction —
+          every item in a set (including the design's own pick) now starts neutral and
+          picks up the orange only while it is actually hovered. See
+          docs/MSME-DESIGN-NOTES.md, this same heading, for the full list of what changed
+          and, deliberately, what didn't (heading text colour, the eyebrow arrow, the
+          nomination form's own state colours).
+          Guarded to real pointers only, so a tap on a phone doesn't leave an item stuck
+          "hovered" - which also means NONE of these ever show their orange on a phone,
+          only the plain neutral state everything now rests in.
+          The !important on every rule below is needed throughout: the baseline colour is
+          the design's own per-item inline value (measured off the comp), which a plain
+          class can't outrank otherwise — the same reason the phone-collapse rules above
+          need it.
+        */
+        @media (hover: hover) and (pointer: fine) {
+          /* Buttons. Every pill is outline-only at rest now, including what used to be the
+             permanently-filled "solid" ones (Register); on hover they all fill orange —
+             except on the orange closing-CTA band, where the outline pills fill white
+             instead (hoverFill="white"), or they would fill orange into orange. Every pill
+             also lifts a couple of px with a soft shadow, on top of whatever fill change
+             applies - the one hover motion every button on the site shares. */
+          .msme-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16);
+          }
+          .msme-btn[data-variant="solid"]:hover,
+          .msme-btn[data-variant="outline"][data-hover-fill="orange"]:hover {
+            background: #FB4E05 !important;
+            border-color: #FB4E05 !important;
+            color: #fff !important;
+          }
+          .msme-btn[data-variant="outline"][data-hover-fill="white"]:hover {
+            background: #fff !important;
+            border-color: #fff !important;
+            color: #FB4E05 !important;
+          }
+          /* Awards banner — the gold "Nominate Now" pill, in the crest's own colour. */
+          .msme-btn[data-variant="outline"][data-hover-fill="gold"]:hover {
+            background: #D4AF37 !important;
+            border-color: #D4AF37 !important;
+            color: #1A1006 !important;
+          }
+          .msme-btn[data-variant="dark"]:hover { filter: brightness(1.12); }
+          /* The header's own Register pill isn't built from Button - see MsmeHeader.tsx -
+             so it needs its own rule, in the header's own shade of orange (#EC5C29), and
+             its own lift to match every other pill's hover motion. */
+          .msme-header-register:hover {
+            background: #EC5C29 !important;
+            color: #fff !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+          }
+
+          /* Home — Growth Story: the six cards and the five focus chips under them. The
+             cards' frame/text/arrow are three separate hand-placed pieces sharing one
+             board (see GROWTH_CARDS in HomeSections.tsx), not a single positioned box, so
+             they can't lift as a unit without the frame and its text parting ways - only
+             the colour change applies there. The chips have no such split, so they lift. */
+          .msme-growth-card:hover .msme-growth-frame {
+            background: #FB4E05 !important;
+            border-color: #FB4E05 !important;
+          }
+          .msme-growth-card:hover .msme-growth-text { color: #fff !important; }
+          .msme-growth-card:hover .msme-growth-arrow span { background-color: #F3F0E9 !important; }
+          .msme-focus-chip:hover {
+            background: #FB4E05 !important;
+            border-color: #FB4E05 !important;
+            color: #fff !important;
+            transform: translateY(-2px);
+          }
+          .msme-focus-chip:hover > span[aria-hidden] { background-color: #fff !important; }
+
+          /* Home — At a Glance tiles: no standing hover state before, so this is new
+             rather than an addition to an existing rule. */
+          .msme-glance-tile:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.28);
+          }
+
+          /* Home — Innovation Showcase chips. Unlike the other sets here these have no
+             fill even when accented ("Enterprise Software" is outline, not filled) - so
+             hover matches that: the border, icon and label turn orange, not the ground,
+             plus the same small lift every chip on the site gets. */
+          .msme-show-chip:hover {
+            border-color: #FB6B01 !important;
+            color: #ff6c00 !important;
+            transform: translateY(-2px);
+          }
+          .msme-show-chip:hover span[aria-hidden] { background-color: #ff6c00 !important; }
+
+          /* Home — Formats tiles and Five Conversations cards: an orange wash fades in
+             over the (now black-and-white at rest, see above) photo underneath, the
+             photo itself un-desaturates and zooms in a couple of percent, and the whole
+             tile lifts. z-index keeps each card's own title/copy above the wash. */
+          .msme-format-tile img,
+          .msme-conv-card img { transition: transform 0.6s ease, filter 0.5s ease; }
+          .msme-format-tile:hover,
+          .msme-conv-card:hover { transform: translateY(-4px); }
+          .msme-format-tile:hover img,
+          .msme-conv-card:hover img { transform: scale(1.05); filter: grayscale(0); }
+          .msme-format-tile::after,
+          .msme-conv-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            /* "color" rather than "multiply": multiply's result depends on the photo
+               underneath as much as this colour, so the same wash read orange over
+               Technology's warm factory shot and muddy brown over Scale's cooler one -
+               visibly different hover colours from one identical rule. "color" instead
+               takes this wash's own hue/saturation and keeps only the photo's
+               luminosity, so every card lands on the same orange regardless of what
+               colour its own photo happened to be. */
+            background: #FB4E05;
+            mix-blend-mode: color;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+          }
+          .msme-format-tile:hover::after,
+          .msme-conv-card:hover::after { opacity: 0.6; }
+          .msme-format-title, .msme-format-copy, .msme-conv-num, .msme-conv-abs {
+            position: relative;
+            z-index: 1;
+          }
+
+          /* About — the "connects with" chip list. */
+          .msme-chip:hover > span { background: #F06F28 !important; }
+          .msme-chip:hover span[aria-hidden] { background-color: #fff !important; }
+          .msme-chip:hover { transform: translateY(-2px); }
+
+          /* About — the five focus areas (Scale, Technology, Capital, Markets, Government)
+             and the three "Understand the opportunity" statements: plain text rows, so
+             just the colour change, no lift (nothing to lift - there's no card underneath
+             either one). */
+          .msme-focus-row:hover span[aria-hidden] { background-color: #FB4E05 !important; }
+          .msme-focus-row:hover .msme-focus-label { color: #FB4E05 !important; }
+          .msme-statement:hover p { color: #FB4E05 !important; }
+
+          /* Who Will Be in the Room: seven roles, same treatment - .msme-who-item already
+             wraps each icon and its label in one element (unlike the focus rows above,
+             which needed msme-focus-row added for exactly this). */
+          .msme-who-item:hover span[aria-hidden] { background-color: #FB4E05 !important; }
+          .msme-who-item:hover .msme-who-text { color: #FB4E05 !important; }
+
+          /* Home — Why Partner cards: a plain hover lift, no colour change in the comp. */
+          .msme-wp-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.14);
+            z-index: 1;
+          }
+
+          /* Awards — the four "Why Nominate" cards. Background, icon and title/body are
+             separately hand-placed (see WHY_NOMINATE), not one wrapped card, so the icon
+             rides the adjacent-sibling combinator off the background box instead of a
+             shared parent; title/body get pointer-events:none so the mouse always lands
+             on the (invisible but full-card-sized) background box beneath them. Being
+             three separate pieces rather than one positioned box, same as the growth
+             cards above, means only the colour change applies here, not a lift. */
+          .msme-nominate-icon, .msme-nominate-text { pointer-events: none; }
+          .msme-nominate-bg:hover > div {
+            background: linear-gradient(240deg, #FF7E00 33%, #F83600 93%) !important;
+          }
+          .msme-nominate-bg:hover + .msme-nominate-icon span { background-color: #fff !important; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            transition-duration: 0.01ms !important;
+          }
+        }
+      0:{"P":null,"c":["","msme","agenda",""],"q":"","i":false,"f":[[["",{"children":["msme",{"children":["agenda",{"children":["__PAGE__",{}]}]}]},"$undefined","$undefined",16],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/0u5cax1bxn2qo.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/_next/static/chunks/08yb0vyff6txf.js","async":true,"nonce":"$undefined"}],["$","script","script-1",{"src":"/_next/static/chunks/0nz2qlxv3r.27.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/0y6gg2mgd4t0h.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]],["$","div",null,{"className":"msme-root archivo_77417737-module__meUqnq__variable","style":{"fontFamily":"var(--font-msme), system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif","background":"#FBF8F2","color":"#2B2B2B","minHeight":"100vh","colorScheme":"light"},"children":[["$","style",null,{"children":"$4"}],"$L5","$L6"]}]]}],{"children":["$L7",{"children":["$L8",{},null,false,null]},null,false,"$@9"]},null,false,null]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"s":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"9o5HJRKsN9O_brXZvGnI2"}
+d:I[94289,["/_next/static/chunks/08yb0vyff6txf.js","/_next/static/chunks/0nz2qlxv3r.27.js","/_next/static/chunks/04i0fco__01~y.js","/_next/static/chunks/0h_t02-r1rjon.js"],"default"]
+e:I[93448,["/_next/static/chunks/08yb0vyff6txf.js","/_next/static/chunks/0nz2qlxv3r.27.js","/_next/static/chunks/04i0fco__01~y.js","/_next/static/chunks/0h_t02-r1rjon.js"],"Reveal"]
+f:I[93448,["/_next/static/chunks/08yb0vyff6txf.js","/_next/static/chunks/0nz2qlxv3r.27.js","/_next/static/chunks/04i0fco__01~y.js","/_next/static/chunks/0h_t02-r1rjon.js"],"Word"]
+10:I[16506,["/_next/static/chunks/08yb0vyff6txf.js","/_next/static/chunks/0nz2qlxv3r.27.js","/_next/static/chunks/04i0fco__01~y.js","/_next/static/chunks/0h_t02-r1rjon.js"],""]
+13:I[3417,["/_next/static/chunks/08yb0vyff6txf.js","/_next/static/chunks/0nz2qlxv3r.27.js","/_next/static/chunks/04i0fco__01~y.js","/_next/static/chunks/0h_t02-r1rjon.js"],"Image"]
+26:I[64381,["/_next/static/chunks/08yb0vyff6txf.js","/_next/static/chunks/0nz2qlxv3r.27.js"],"ViewportBoundary"]
+28:I[64381,["/_next/static/chunks/08yb0vyff6txf.js","/_next/static/chunks/0nz2qlxv3r.27.js"],"MetadataBoundary"]
+29:"$Sreact.suspense"
+5:["$","script",null,{"type":"application/ld+json","dangerouslySetInnerHTML":{"__html":"{\"@context\":\"https://schema.org\",\"@type\":\"BusinessEvent\",\"name\":\"MSME & Startup Innovation Summit – 6th Edition\",\"description\":\"Where India's growing businesses meet the people, ideas and opportunities shaping their next stage of growth. Hosted in Bengaluru. Built for India.\",\"startDate\":\"2026-12-02\",\"eventAttendanceMode\":\"https://schema.org/OfflineEventAttendanceMode\",\"eventStatus\":\"https://schema.org/EventScheduled\",\"url\":\"https://msme.summentorpro.com\",\"location\":{\"@type\":\"Place\",\"name\":\"Bengaluru, India\",\"address\":{\"@type\":\"PostalAddress\",\"addressLocality\":\"Bengaluru\",\"addressCountry\":\"IN\"}},\"organizer\":{\"@type\":\"Organization\",\"name\":\"Summentor Pro\",\"url\":\"https://www.summentorpro.com\"}}"}}]
+6:["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","$Ld",null,{}],["$","main",null,{"id":"msme-main","tabIndex":-1,"children":["$","$Le",null,{"tag":"section","id":"$undefined","style":{"background":"#F3F0E9","paddingTop":"max(30.746900010294986px, calc(133.7490150447832 * var(--u)))","paddingBottom":"max(29.754908407497375px, calc(148.77454203748687 * var(--u)))","minHeight":"56vh"},"children":["$","div",null,{"className":"msme-container","style":"$undefined","children":[["$","p",null,{"style":{"display":"flex","alignItems":"center","gap":"max(12px, calc(37 * var(--u)))","margin":"0 0 max(14.89395807093901px, calc(65.16106656035817 * var(--u)))","maxWidth":"$undefined","paddingLeft":"calc(6 * var(--u))","fontSize":"max(14.38990848px, calc(71.9495424 * var(--u)))","fontWeight":700,"lineHeight":1.05,"letterSpacing":"0","color":"#2E2E2E","textTransform":"uppercase"},"children":[["$","span",null,{"aria-hidden":"true","style":{"display":"inline-block","flexShrink":0,"width":"max(26px, calc(83 * var(--u)))","height":"max(11px, calc(35 * var(--u)))","backgroundColor":"#FF7200","WebkitMask":"url(\"/msme/icons/arrow-orange.webp\") center / contain no-repeat","mask":"url(\"/msme/icons/arrow-orange.webp\") center / contain no-repeat"}}],"404"]}],["$","h1",null,{"style":{"margin":"0 0 calc(57.160539982870894 * var(--u))","fontSize":"max(21.461683200000003px, calc(107.30841600000001 * var(--u)))","maxWidth":"100%","lineHeight":0.92,"fontWeight":900,"fontStretch":"95%","letterSpacing":"-0.01em","textTransform":"uppercase","color":"#303131"},"children":[["$","$1","0",{"children":[[["$","$1","dp-0-0",{"children":[["$","$Lf",null,{"delay":0,"style":{"color":"#F05022"},"children":"Page"}],""]}]],"$undefined"]}],["$","$1","1",{"children":[[["$","$1","dp-1-0",{"children":[["$","$Lf",null,{"delay":0.06,"style":{},"children":"Not"}]," "]}],["$","$1","dp-1-1",{"children":[["$","$Lf",null,{"delay":0.12,"style":"$6:props:notFound:0:1:props:children:props:children:props:children:1:props:children:1:props:children:0:0:props:children:0:props:style","children":"Found"}],""]}]],"$undefined"]}]]}],["$","p",null,{"className":"$undefined","style":{"margin":"0 0 max(10px, calc(25 * var(--u)))","fontSize":"max(12.572994560000001px, calc(44.903552000000005 * var(--u)))","lineHeight":1.3,"fontWeight":400,"color":"#000000","maxWidth":"calc(1300 * var(--u))"},"children":"That page isn’t part of the summit site. It may have moved, or the address may have a typo in it."}],["$","div",null,{"style":{"display":"flex","flexWrap":"wrap","gap":"max(10px, calc(20 * var(--u)))","marginTop":"calc(60 * var(--u))"},"children":["$","$L10",null,{"className":"msme-btn","href":"/msme","data-variant":"solid","data-hover-fill":"$undefined","style":{"display":"inline-flex","alignItems":"center","justifyContent":"center","minHeight":"max(44px, calc(100 * var(--u)))","minWidth":"$undefined","padding":"0 max(22px, calc(50 * var(--u)))","borderRadius":999,"fontSize":"max(12.20775948288px, calc(34.745161605119996 * var(--u)))","textTransform":"$undefined","letterSpacing":"$undefined","fontWeight":600,"textDecoration":"none","whiteSpace":"nowrap","transition":"background-color .15s ease, border-color .15s ease, color .15s ease, filter .15s ease, transform .2s ease, box-shadow .2s ease","background":"transparent","color":"#FB4E05","border":"max(1px, calc(3 * var(--u))) solid #FB4E05"},"children":"Back to the summit"}]}],["$","nav",null,{"style":{"marginTop":"calc(90 * var(--u))"},"children":[["$","p",null,{"style":{"margin":"0 0 max(10px, calc(30 * var(--u)))","fontSize":"max(12.61328320512px, calc(27.16707151872 * var(--u)))","fontWeight":700,"letterSpacing":"0.1em","textTransform":"uppercase","color":"#5A5A5A"},"children":"Or try"}],["$","div",null,{"style":{"display":"flex","flexWrap":"wrap","gap":"max(10px, calc(24 * var(--u))) max(20px, calc(60 * var(--u)))"},"children":[["$","$L10","/msme/about",{"href":"/msme/about","style":{"fontSize":"max(12.91830636544px, calc(38.75491909632 * var(--u)))","fontWeight":700,"color":"#FB4E05","textDecoration":"none","borderBottom":"1px solid #FB4E05","paddingBottom":2},"children":"About"}],["$","$L10","/msme/agenda",{"href":"/msme/agenda","style":{"fontSize":"max(12.91830636544px, calc(38.75491909632 * var(--u)))","fontWeight":700,"color":"#FB4E05","textDecoration":"none","borderBottom":"1px solid #FB4E05","paddingBottom":2},"children":"Agenda"}],["$","$L10","/msme/awards",{"href":"/msme/awards","style":{"fontSize":"max(12.91830636544px, calc(38.75491909632 * var(--u)))","fontWeight":700,"color":"#FB4E05","textDecoration":"none","borderBottom":"1px solid #FB4E05","paddingBottom":2},"children":"#Time2Leap Awards"}],"$L11"]}]]}]]}]}]}],"$L12"],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]
+7:["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}]
+8:["$","$1","c",{"children":[[["$","$Ld",null,{}],["$","main",null,{"id":"msme-main","tabIndex":-1,"children":[["$","$Le",null,{"tag":"section","style":{"position":"relative","background":"#0D0D0D","color":"#fff","overflow":"hidden","paddingTop":"max(61.25239669246253px, calc(257.26006610834264 * var(--u)))","paddingBottom":"max(34.26794551105834px, calc(223.769684187211 * var(--u)))"},"children":[["$","div",null,{"style":{"position":"absolute","width":"100%","height":"100%","overflow":"hidden","inset":0},"children":["$","$L13",null,{"src":"/msme/photos/agenda-banner.webp","alt":"","fill":true,"priority":true,"sizes":"(max-width: 640px) 100vw, (max-width: 1180px) 100vw, 1180px","style":{"objectFit":"cover"}}]}],["$","div",null,{"className":"msme-container","style":{"position":"relative"},"children":["$","h1",null,{"style":{"margin":0,"fontSize":"max(38.08px, calc(183.6 * var(--u)))","fontWeight":900,"fontStretch":"95%","lineHeight":0.85,"letterSpacing":"-0.01em","textTransform":"uppercase"},"children":"Agenda"}]}]]}],["$","section",null,{"style":{"position":"relative","overflow":"hidden","background":"#FFFAEE","paddingTop":"max(30.498572501878286px, calc(137.2435762584523 * var(--u)))","paddingBottom":"max(28.136063711495115px, calc(185.69802049586778 * var(--u)))"},"children":[["$","div",null,{"aria-hidden":"true","style":{"position":"absolute","left":"43.31384015594542%","width":"60.15594541910332%","top":"calc(2015 * var(--u))","height":"calc(840 * var(--u))","pointerEvents":"none","clipPath":"polygon(0 0, 40.3% 0, 100% 100%)","background":"linear-gradient(to bottom, rgba(0,0,0,.016) 0%, rgba(0,0,0,.017) 10.7%, rgba(0,0,0,.02) 17.9%, rgba(0,0,0,.031) 25%, rgba(0,0,0,.039) 29.8%, rgba(0,0,0,.065) 44%, rgba(0,0,0,.069) 50%, rgba(0,0,0,.061) 58.3%, rgba(0,0,0,.054) 63%, rgba(0,0,0,.039) 67.9%, rgba(0,0,0,.02) 77.4%, rgba(0,0,0,.016) 86.9%, rgba(0,0,0,.016) 100%)"}}],["$","div",null,{"className":"msme-container","style":{"position":"relative"},"children":[["$","ol",null,{"style":{"listStyle":"none","margin":0,"padding":0},"children":[["$","$Le","09:30 AM-Registration & Networking",{"tag":"li","delay":0,"y":14,"style":{"display":"grid","gridTemplateColumns":"max(120px, calc(729 * var(--u))) 1fr","alignItems":"start","minHeight":"max(70px, calc(224 * var(--u)))","marginLeft":"calc(-8 * var(--u))","marginRight":"calc(-9 * var(--u))","paddingTop":"max(14.826498014207077px, calc(66.71924106393185 * var(--u)))","borderTop":"max(1px, calc(3 * var(--u))) solid #DEDAD0"},"children":[["$","span",null,{"style":{"color":"#FB4E05","fontWeight":800,"fontSize":"max(13.38523582464px, calc(61.07013844992 * var(--u)))","fontStretch":"104.3%","lineHeight":1,"fontVariantNumeric":"tabular-nums","whiteSpace":"nowrap","position":"relative","left":"calc(0 * var(--u))","top":"calc(1 * var(--u))"},"children":["09:30 AM"," —"]}],["$","span",null,{"style":{"position":"relative","left":"calc(0 * var(--u))","top":"calc(-3 * var(--u))","paddingTop":"calc(8 * var(--u))"},"children":[["$","span",null,{"style":{"display":"block","fontWeight":800,"fontStretch":"98%","fontSize":"max(13.0045298688px, calc(52.88508813312 * var(--u)))","textTransform":"uppercase","lineHeight":1,"color":"#242424"},"children":"Registration & Networking"}],"$undefined"]}]]}],["$","$Le","10:15 AM-Opening Session",{"tag":"li","delay":0.05,"y":14,"style":{"display":"grid","gridTemplateColumns":"max(120px, calc(729 * var(--u))) 1fr","alignItems":"start","minHeight":"max(70px, calc(308 * var(--u)))","marginLeft":"calc(-8 * var(--u))","marginRight":"calc(-9 * var(--u))","paddingTop":"max(14.826498014207077px, calc(66.71924106393185 * var(--u)))","borderTop":"max(1px, calc(3 * var(--u))) solid #DEDAD0"},"children":[["$","span",null,{"style":{"color":"#FB4E05","fontWeight":800,"fontSize":"max(13.38523582464px, calc(61.07013844992 * var(--u)))","fontStretch":"104.3%","lineHeight":1,"fontVariantNumeric":"tabular-nums","whiteSpace":"nowrap","position":"relative","left":"calc(1 * var(--u))","top":"calc(2 * var(--u))"},"children":["10:15 AM"," —"]}],["$","span",null,{"style":{"position":"relative","left":"calc(0 * var(--u))","top":"calc(-3 * var(--u))","paddingTop":"calc(8 * var(--u))"},"children":[["$","span",null,{"style":{"display":"block","fontWeight":800,"fontStretch":"98%","fontSize":"max(13.0045298688px, calc(52.88508813312 * var(--u)))","textTransform":"uppercase","lineHeight":1,"color":"#242424"},"children":"Opening Session"}],"$L14"]}]]}],"$L15","$L16","$L17","$L18","$L19","$L1a","$L1b","$L1c","$L1d","$L1e","$L1f"]}],"$L20"]}]]}]]}],"$L21"],["$L22","$L23"],"$L24"]}]
+25:[]
+9:"$W25"
+a:["$","$1","h",{"children":[null,["$","$L26",null,{"children":"$L27"}],["$","div",null,{"hidden":true,"children":["$","$L28",null,{"children":["$","$29",null,{"name":"Next.Metadata","children":"$L2a"}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}]
+c:["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/0u5cax1bxn2qo.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
+33:I[64381,["/_next/static/chunks/08yb0vyff6txf.js","/_next/static/chunks/0nz2qlxv3r.27.js"],"OutletBoundary"]
+11:["$","$L10","/msme/faq",{"href":"/msme/faq","style":{"fontSize":"max(12.91830636544px, calc(38.75491909632 * var(--u)))","fontWeight":700,"color":"#FB4E05","textDecoration":"none","borderBottom":"1px solid #FB4E05","paddingBottom":2},"children":"FAQ"}]
+12:["$","footer",null,{"style":{"background":"#252525","color":"#FFFFFF"},"children":["$","div",null,{"className":"msme-container","children":["$","div",null,{"className":"msme-footer-board","style":{"position":"relative","height":"calc(875 * var(--u))","width":"100%"},"children":[["$","span",null,{"className":"msme-footer-abs","style":{"position":"absolute","left":"calc(10 * var(--u))","top":"calc(84 * var(--u))"},"children":["$","div",null,{"style":{"position":"relative","width":"max(190px, calc(544 * var(--u)))","aspectRatio":"782 / 420","overflow":"hidden"},"children":["$","$L13",null,{"src":"/msme/logos/summit-lockup-footer.webp","alt":"MSME & Startup Innovation Summit – 6th Edition","fill":true,"priority":false,"sizes":"(max-width: 640px) 100vw, (max-width: 1180px) 100vw, 1180px","style":{"objectFit":"contain"}}]}]}],["$","p",null,{"className":"msme-footer-abs","style":{"position":"absolute","left":"calc(651 * var(--u))","top":"calc(146.8 * var(--u))","margin":0,"fontSize":"max(17.1806478336px, calc(54.97807306752 * var(--u)))","fontWeight":600,"letterSpacing":"0.01em","lineHeight":"0.8750","textTransform":"uppercase","whiteSpace":"nowrap"},"children":["Building",["$","br",null,{}],"India’s Future"]}],["$","p",null,{"className":"msme-footer-abs","style":{"position":"absolute","left":"calc(652 * var(--u))","top":"calc(290.6 * var(--u))","margin":0,"fontFamily":"Arial, \"Helvetica Neue\", Helvetica, sans-serif","fontSize":"max(14.237915443199999px, calc(32.27260833792 * var(--u)))","lineHeight":1,"color":"#D6D5D4","whiteSpace":"nowrap"},"children":["2nd December 2026",["$","span",null,{"aria-hidden":"true","style":{"marginLeft":"calc(8 * var(--u))"},"children":"|"}],["$","span",null,{"style":{"marginLeft":"calc(19 * var(--u))"},"children":"Bengaluru, India"}]]}],["$","nav",null,{"aria-label":"Summit","className":"msme-footer-nav","children":[["$","$L10","/msme/about",{"href":"/msme/about","className":"msme-footer-abs","style":{"position":"absolute","left":"calc(1371 * var(--u))","top":"calc(130.7 * var(--u))","fontFamily":"Arial, \"Helvetica Neue\", Helvetica, sans-serif","fontSize":"max(12.75535872px, calc(24.529536 * var(--u)))","letterSpacing":"0.05em","lineHeight":1,"textTransform":"uppercase","color":"#AAA9AF","textDecoration":"none","whiteSpace":"nowrap"},"children":"About"}],["$","$L10","/msme/agenda",{"href":"/msme/agenda","className":"msme-footer-abs","style":{"position":"absolute","left":"calc(1864 * var(--u))","top":"calc(130.7 * var(--u))","fontFamily":"Arial, \"Helvetica Neue\", Helvetica, sans-serif","fontSize":"max(12.75535872px, calc(24.529536 * var(--u)))","letterSpacing":"0.05em","lineHeight":1,"textTransform":"uppercase","color":"#AAA9AF","textDecoration":"none","whiteSpace":"nowrap"},"children":"Agenda"}],["$","$L10","/msme/awards",{"href":"/msme/awards","className":"msme-footer-abs","style":{"position":"absolute","left":"calc(1372 * var(--u))","top":"calc(216.7 * var(--u))","fontFamily":"Arial, \"Helvetica Neue\", Helvetica, sans-serif","fontSize":"max(12.75535872px, calc(24.529536 * var(--u)))","letterSpacing":"0.05em","lineHeight":1,"textTransform":"uppercase","color":"#AAA9AF","textDecoration":"none","whiteSpace":"nowrap"},"children":"#Time2Leap Awards"}],["$","$L10","/msme/past-editions",{"href":"/msme/past-editions","className":"msme-footer-abs","style":{"position":"absolute","left":"calc(1865 * var(--u))","top":"calc(216.7 * var(--u))","fontFamily":"Arial, \"Helvetica Neue\", Helvetica, sans-serif","fontSize":"max(12.75535872px, calc(24.529536 * var(--u)))","letterSpacing":"0.05em","lineHeight":1,"textTransform":"uppercase","color":"#AAA9AF","textDecoration":"none","whiteSpace":"nowrap"},"children":"Past Editions"}],["$","$L10","/msme/faq",{"href":"/msme/faq","className":"msme-footer-abs","style":{"position":"absolute","left":"calc(1373 * var(--u))","top":"calc(301.7 * var(--u))","fontFamily":"Arial, \"Helvetica Neue\", Helvetica, sans-serif","fontSize":"max(12.75535872px, calc(24.529536 * var(--u)))","letterSpacing":"0.05em","lineHeight":1,"textTransform":"uppercase","color":"#AAA9AF","textDecoration":"none","whiteSpace":"nowrap"},"children":"FAQ"}],["$","$L10","/msme/contact",{"href":"/msme/contact","className":"msme-footer-abs","style":{"position":"absolute","left":"calc(1865 * var(--u))","top":"calc(301.7 * var(--u))","fontFamily":"Arial, \"Helvetica Neue\", Helvetica, sans-serif","fontSize":"max(12.75535872px, calc(24.529536 * var(--u)))","letterSpacing":"0.05em","lineHeight":1,"textTransform":"uppercase","color":"#AAA9AF","textDecoration":"none","whiteSpace":"nowrap"},"children":"Contact"}]]}],"$L2b","$L2c","$L2d","$L2e"]}]}]}]
+14:["$","span",null,{"style":{"display":"block","marginTop":"calc(31 * var(--u))","fontSize":"max(10.92220084224px, calc(41.86843656192 * var(--u)))","lineHeight":1.1,"color":"#5A5A5A"},"children":"Building India’s Future"}]
+15:["$","$Le","10:45 AM-Panel 1",{"tag":"li","delay":0.1,"y":14,"style":{"display":"grid","gridTemplateColumns":"max(120px, calc(729 * var(--u))) 1fr","alignItems":"start","minHeight":"max(70px, calc(307 * var(--u)))","marginLeft":"calc(-8 * var(--u))","marginRight":"calc(-9 * var(--u))","paddingTop":"max(14.826498014207077px, calc(66.71924106393185 * var(--u)))","borderTop":"max(1px, calc(3 * var(--u))) solid #DEDAD0"},"children":[["$","span",null,{"style":{"color":"#FB4E05","fontWeight":800,"fontSize":"max(13.38523582464px, calc(61.07013844992 * var(--u)))","fontStretch":"104.3%","lineHeight":1,"fontVariantNumeric":"tabular-nums","whiteSpace":"nowrap","position":"relative","left":"calc(1 * var(--u))","top":"calc(1 * var(--u))"},"children":["10:45 AM"," —"]}],["$","span",null,{"style":{"position":"relative","left":"calc(0 * var(--u))","top":"calc(-3 * var(--u))","paddingTop":"calc(8 * var(--u))"},"children":[["$","span",null,{"style":{"display":"block","fontWeight":800,"fontStretch":"98%","fontSize":"max(13.0045298688px, calc(52.88508813312 * var(--u)))","textTransform":"uppercase","lineHeight":1,"color":"#242424"},"children":"Panel 1"}],["$","span",null,{"style":{"display":"block","marginTop":"calc(31 * var(--u))","fontSize":"max(10.92220084224px, calc(41.86843656192 * var(--u)))","lineHeight":1.1,"color":"#5A5A5A"},"children":"Scaling Smarter: Technology, Capital & Execution"}]]}]]}]
+16:["$","$Le","11:25 AM-Innovation Showcase",{"tag":"li","delay":0.15000000000000002,"y":14,"style":{"display":"grid","gridTemplateColumns":"max(120px, calc(729 * var(--u))) 1fr","alignItems":"start","minHeight":"max(70px, calc(238 * var(--u)))","marginLeft":"calc(-8 * var(--u))","marginRight":"calc(-9 * var(--u))","paddingTop":"max(14.826498014207077px, calc(66.71924106393185 * var(--u)))","borderTop":"max(1px, calc(3 * var(--u))) solid #DEDAD0"},"children":[["$","span",null,{"style":{"color":"#FB4E05","fontWeight":800,"fontSize":"max(13.38523582464px, calc(61.07013844992 * var(--u)))","fontStretch":"102.6%","lineHeight":1,"fontVariantNumeric":"tabular-nums","whiteSpace":"nowrap","position":"relative","left":"calc(16 * var(--u))","top":"calc(17 * var(--u))"},"children":["11:25 AM"," —"]}],["$","span",null,{"style":{"position":"relative","left":"calc(3 * var(--u))","top":"calc(13 * var(--u))","paddingTop":"calc(8 * var(--u))"},"children":[["$","span",null,{"style":{"display":"block","fontWeight":800,"fontStretch":"98%","fontSize":"max(13.0045298688px, calc(52.88508813312 * var(--u)))","textTransform":"uppercase","lineHeight":1,"color":"#242424"},"children":"Innovation Showcase"}],"$undefined"]}]]}]
+17:["$","$Le","12:10 PM-Panel 2",{"tag":"li","delay":0.2,"y":14,"style":{"display":"grid","gridTemplateColumns":"max(120px, calc(729 * var(--u))) 1fr","alignItems":"start","minHeight":"max(70px, calc(301 * var(--u)))","marginLeft":"calc(8 * var(--u))","marginRight":"calc(9 * var(--u))","paddingTop":"max(14.826498014207077px, calc(66.71924106393185 * var(--u)))","borderTop":"max(1px, calc(3 * var(--u))) solid #DEDAD0"},"children":[["$","span",null,{"style":{"color":"#FB4E05","fontWeight":800,"fontSize":"max(13.38523582464px, calc(61.07013844992 * var(--u)))","fontStretch":"102.6%","lineHeight":1,"fontVariantNumeric":"tabular-nums","whiteSpace":"nowrap","position":"relative","left":"calc(0 * var(--u))","top":"calc(-1 * var(--u))"},"children":["12:10 PM"," —"]}],["$","span",null,{"style":{"position":"relative","left":"calc(-13 * var(--u))","top":"calc(-5 * var(--u))","paddingTop":"calc(8 * var(--u))"},"children":[["$","span",null,{"style":{"display":"block","fontWeight":800,"fontStretch":"98%","fontSize":"max(13.0045298688px, calc(52.88508813312 * var(--u)))","textTransform":"uppercase","lineHeight":1,"color":"#242424"},"children":"Panel 2"}],["$","span",null,{"style":{"display":"block","marginTop":"calc(31 * var(--u))","fontSize":"max(10.92220084224px, calc(41.86843656192 * var(--u)))","lineHeight":1.1,"color":"#5A5A5A"},"children":"Beyond Existing Markets: From India to the World"}]]}]]}]
+18:["$","$Le","12:50 PM-Innovation Showcase",{"tag":"li","delay":0.25,"y":14,"style":{"display":"grid","gridTemplateColumns":"max(120px, calc(729 * var(--u))) 1fr","alignItems":"start","minHeight":"max(70px, calc(220 * var(--u)))","marginLeft":"calc(8 * var(--u))","marginRight":"calc(9 * var(--u))","paddingTop":"max(14.826498014207077px, calc(66.71924106393185 * var(--u)))","borderTop":"max(1px, calc(3 * var(--u))) solid #DEDAD0"},"children":[["$","span",null,{"style":{"color":"#FB4E05","fontWeight":800,"fontSize":"max(13.38523582464px, calc(61.07013844992 * var(--u)))","fontStretch":"102.6%","lineHeight":1,"fontVariantNumeric":"tabular-nums","whiteSpace":"nowrap","position":"relative","left":"calc(0 * var(--u))","top":"calc(0 * var(--u))"},"children":["12:50 PM"," —"]}],["$","span",null,{"style":{"position":"relative","left":"calc(-13 * var(--u))","top":"calc(-5 * var(--u))","paddingTop":"calc(8 * var(--u))"},"children":[["$","span",null,{"style":{"display":"block","fontWeight":800,"fontStretch":"98%","fontSize":"max(13.0045298688px, calc(52.88508813312 * var(--u)))","textTransform":"uppercase","lineHeight":1,"color":"#242424"},"children":"Innovation Showcase"}],"$undefined"]}]]}]
+19:["$","$Le","01:20 PM-Networking Lunch",{"tag":"li","delay":0.30000000000000004,"y":14,"style":{"display":"grid","gridTemplateColumns":"max(120px, calc(729 * var(--u))) 1fr","alignItems":"start","minHeight":"max(70px, calc(220 * var(--u)))","marginLeft":"calc(8 * var(--u))","marginRight":"calc(9 * var(--u))","paddingTop":"max(14.826498014207077px, calc(66.71924106393185 * var(--u)))","borderTop":"max(1px, calc(3 * var(--u))) solid #DEDAD0"},"children":[["$","span",null,{"style":{"color":"#FB4E05","fontWeight":800,"fontSize":"max(13.38523582464px, calc(61.07013844992 * var(--u)))","fontStretch":"102.6%","lineHeight":1,"fontVariantNumeric":"tabular-nums","whiteSpace":"nowrap","position":"relative","left":"calc(0 * var(--u))","top":"calc(0 * var(--u))"},"children":["01:20 PM"," —"]}],["$","span",null,{"style":{"position":"relative","left":"calc(-13 * var(--u))","top":"calc(-5 * var(--u))","paddingTop":"calc(8 * var(--u))"},"children":[["$","span",null,{"style":{"display":"block","fontWeight":800,"fontStretch":"98%","fontSize":"max(13.0045298688px, calc(52.88508813312 * var(--u)))","textTransform":"uppercase","lineHeight":1,"color":"#242424"},"children":"Networking Lunch"}],"$undefined"]}]]}]
+1a:["$","$Le","02:10 PM-B2B Connect",{"tag":"li","delay":0.30000000000000004,"y":14,"style":{"display":"grid","gridTemplateColumns":"max(120px, calc(729 * var(--u))) 1fr","alignItems":"start","minHeight":"max(70px, calc(220 * var(--u)))","marginLeft":"calc(8 * var(--u))","marginRight":"calc(9 * var(--u))","paddingTop":"max(14.826498014207077px, calc(66.71924106393185 * var(--u)))","borderTop":"max(1px, calc(3 * var(--u))) solid #DEDAD0"},"children":[["$","span",null,{"style":{"color":"#FB4E05","fontWeight":800,"fontSize":"max(13.38523582464px, calc(61.07013844992 * var(--u)))","fontStretch":"102.6%","lineHeight":1,"fontVariantNumeric":"tabular-nums","whiteSpace":"nowrap","position":"relative","left":"calc(0 * var(--u))","top":"calc(0 * var(--u))"},"children":["02:10 PM"," —"]}],["$","span",null,{"style":{"position":"relative","left":"calc(-13 * var(--u))","top":"calc(-5 * var(--u))","paddingTop":"calc(8 * var(--u))"},"children":[["$","span",null,{"style":{"display":"block","fontWeight":800,"fontStretch":"98%","fontSize":"max(13.0045298688px, calc(52.88508813312 * var(--u)))","textTransform":"uppercase","lineHeight":1,"color":"#242424"},"children":"B2B Connect"}],"$undefined"]}]]}]
+1b:["$","$Le","03:10 PM-Government & Industry Dialogue",{"tag":"li","delay":0.30000000000000004,"y":14,"style":{"display":"grid","gridTemplateColumns":"max(120px, calc(729 * var(--u))) 1fr","alignItems":"start","minHeight":"max(70px, calc(302 * var(--u)))","marginLeft":"calc(8 * var(--u))","marginRight":"calc(9 * var(--u))","paddingTop":"max(14.826498014207077px, calc(66.71924106393185 * var(--u)))","borderTop":"max(1px, calc(3 * var(--u))) solid #DEDAD0"},"children":[["$","span",null,{"style":{"color":"#FB4E05","fontWeight":800,"fontSize":"max(13.38523582464px, calc(61.07013844992 * var(--u)))","fontStretch":"102.6%","lineHeight":1,"fontVariantNumeric":"tabular-nums","whiteSpace":"nowrap","position":"relative","left":"calc(0 * var(--u))","top":"calc(0 * var(--u))"},"children":["03:10 PM"," —"]}],["$","span",null,{"style":{"position":"relative","left":"calc(-13 * var(--u))","top":"calc(-5 * var(--u))","paddingTop":"calc(8 * var(--u))"},"children":[["$","span",null,{"style":{"display":"block","fontWeight":800,"fontStretch":"98%","fontSize":"max(13.0045298688px, calc(52.88508813312 * var(--u)))","textTransform":"uppercase","lineHeight":1,"color":"#242424"},"children":"Government & Industry Dialogue"}],["$","span",null,{"style":{"display":"block","marginTop":"calc(31 * var(--u))","fontSize":"max(10.92220084224px, calc(41.86843656192 * var(--u)))","lineHeight":1.1,"color":"#5A5A5A"},"children":"From Policy to Enterprise"}]]}]]}]
+1c:["$","$Le","03:45 PM-Leadership Conversation",{"tag":"li","delay":0.30000000000000004,"y":14,"style":{"display":"grid","gridTemplateColumns":"max(120px, calc(729 * var(--u))) 1fr","alignItems":"start","minHeight":"max(70px, calc(301 * var(--u)))","marginLeft":"calc(8 * var(--u))","marginRight":"calc(9 * var(--u))","paddingTop":"max(14.826498014207077px, calc(66.71924106393185 * var(--u)))","borderTop":"max(1px, calc(3 * var(--u))) solid #DEDAD0"},"children":[["$","span",null,{"style":{"color":"#FB4E05","fontWeight":800,"fontSize":"max(13.38523582464px, calc(61.07013844992 * var(--u)))","fontStretch":"102.6%","lineHeight":1,"fontVariantNumeric":"tabular-nums","whiteSpace":"nowrap","position":"relative","left":"calc(0 * var(--u))","top":"calc(-1 * var(--u))"},"children":["03:45 PM"," —"]}],["$","span",null,{"style":{"position":"relative","left":"calc(-13 * var(--u))","top":"calc(-5 * var(--u))","paddingTop":"calc(8 * var(--u))"},"children":[["$","span",null,{"style":{"display":"block","fontWeight":800,"fontStretch":"98%","fontSize":"max(13.0045298688px, calc(52.88508813312 * var(--u)))","textTransform":"uppercase","lineHeight":1,"color":"#242424"},"children":"Leadership Conversation"}],["$","span",null,{"style":{"display":"block","marginTop":"calc(31 * var(--u))","fontSize":"max(10.92220084224px, calc(41.86843656192 * var(--u)))","lineHeight":1.1,"color":"#5A5A5A"},"children":"The Lessons Behind the Growth"}]]}]]}]
+1d:["$","$Le","04:10 PM-Networking Tea",{"tag":"li","delay":0.30000000000000004,"y":14,"style":{"display":"grid","gridTemplateColumns":"max(120px, calc(729 * var(--u))) 1fr","alignItems":"start","minHeight":"max(70px, calc(220 * var(--u)))","marginLeft":"calc(8 * var(--u))","marginRight":"calc(9 * var(--u))","paddingTop":"max(14.826498014207077px, calc(66.71924106393185 * var(--u)))","borderTop":"max(1px, calc(3 * var(--u))) solid #DEDAD0"},"children":[["$","span",null,{"style":{"color":"#FB4E05","fontWeight":800,"fontSize":"max(13.38523582464px, calc(61.07013844992 * var(--u)))","fontStretch":"102.6%","lineHeight":1,"fontVariantNumeric":"tabular-nums","whiteSpace":"nowrap","position":"relative","left":"calc(0 * var(--u))","top":"calc(0 * var(--u))"},"children":["04:10 PM"," —"]}],["$","span",null,{"style":{"position":"relative","left":"calc(-13 * var(--u))","top":"calc(-5 * var(--u))","paddingTop":"calc(8 * var(--u))"},"children":[["$","span",null,{"style":{"display":"block","fontWeight":800,"fontStretch":"98%","fontSize":"max(13.0045298688px, calc(52.88508813312 * var(--u)))","textTransform":"uppercase","lineHeight":1,"color":"#242424"},"children":"Networking Tea"}],"$undefined"]}]]}]
+1e:["$","$Le","04:30 PM-#Time2Leap Awards – 6th Edition",{"tag":"li","delay":0.30000000000000004,"y":14,"style":{"display":"grid","gridTemplateColumns":"max(120px, calc(729 * var(--u))) 1fr","alignItems":"start","minHeight":"max(70px, calc(220 * var(--u)))","marginLeft":"calc(8 * var(--u))","marginRight":"calc(9 * var(--u))","paddingTop":"max(14.826498014207077px, calc(66.71924106393185 * var(--u)))","borderTop":"max(1px, calc(3 * var(--u))) solid #DEDAD0"},"children":[["$","span",null,{"style":{"color":"#FB4E05","fontWeight":800,"fontSize":"max(13.38523582464px, calc(61.07013844992 * var(--u)))","fontStretch":"102.6%","lineHeight":1,"fontVariantNumeric":"tabular-nums","whiteSpace":"nowrap","position":"relative","left":"calc(0 * var(--u))","top":"calc(0 * var(--u))"},"children":["04:30 PM"," —"]}],["$","span",null,{"style":{"position":"relative","left":"calc(-13 * var(--u))","top":"calc(-5 * var(--u))","paddingTop":"calc(8 * var(--u))"},"children":[["$","span",null,{"style":{"display":"block","fontWeight":800,"fontStretch":"98%","fontSize":"max(13.0045298688px, calc(52.88508813312 * var(--u)))","textTransform":"uppercase","lineHeight":1,"color":"#242424"},"children":"#Time2Leap Awards – 6th Edition"}],"$undefined"]}]]}]
+1f:["$","$Le","05:40 PM-Closing",{"tag":"li","delay":0.30000000000000004,"y":14,"style":{"display":"grid","gridTemplateColumns":"max(120px, calc(729 * var(--u))) 1fr","alignItems":"start","minHeight":"max(70px, calc(223 * var(--u)))","marginLeft":"calc(8 * var(--u))","marginRight":"calc(9 * var(--u))","paddingTop":"max(14.826498014207077px, calc(66.71924106393185 * var(--u)))","borderTop":"max(1px, calc(3 * var(--u))) solid #DEDAD0","borderBottom":"max(1px, calc(3 * var(--u))) solid #DEDAD0"},"children":[["$","span",null,{"style":{"color":"#FB4E05","fontWeight":800,"fontSize":"max(13.38523582464px, calc(61.07013844992 * var(--u)))","fontStretch":"102.6%","lineHeight":1,"fontVariantNumeric":"tabular-nums","whiteSpace":"nowrap","position":"relative","left":"calc(0 * var(--u))","top":"calc(0 * var(--u))"},"children":["05:40 PM"," —"]}],["$","span",null,{"style":{"position":"relative","left":"calc(-13 * var(--u))","top":"calc(-5 * var(--u))","paddingTop":"calc(8 * var(--u))"},"children":[["$","span",null,{"style":{"display":"block","fontWeight":800,"fontStretch":"98%","fontSize":"max(13.0045298688px, calc(52.88508813312 * var(--u)))","textTransform":"uppercase","lineHeight":1,"color":"#242424"},"children":"Closing"}],"$undefined"]}]]}]
+20:["$","p",null,{"style":{"margin":"calc(69 * var(--u)) 0 0","fontSize":"max(13.42358061056px, calc(60.40611274752 * var(--u)))","lineHeight":1.28,"color":"#242424"},"children":["Detailed agenda, speakers and session timings will be",["$","br",null,{"className":"msme-br"}]," announced in phases."]}]
+21:["$","footer",null,{"style":{"background":"#252525","color":"#FFFFFF"},"children":["$","div",null,{"className":"msme-container","children":["$","div",null,{"className":"msme-footer-board","style":{"position":"relative","height":"calc(875 * var(--u))","width":"100%"},"children":[["$","span",null,{"className":"msme-footer-abs","style":{"position":"absolute","left":"calc(10 * var(--u))","top":"calc(84 * var(--u))"},"children":["$","div",null,{"style":{"position":"relative","width":"max(190px, calc(544 * var(--u)))","aspectRatio":"782 / 420","overflow":"hidden"},"children":["$","$L13",null,{"src":"/msme/logos/summit-lockup-footer.webp","alt":"MSME & Startup Innovation Summit – 6th Edition","fill":true,"priority":false,"sizes":"(max-width: 640px) 100vw, (max-width: 1180px) 100vw, 1180px","style":{"objectFit":"contain"}}]}]}],["$","p",null,{"className":"msme-footer-abs","style":{"position":"absolute","left":"calc(651 * var(--u))","top":"calc(146.8 * var(--u))","margin":0,"fontSize":"max(17.1806478336px, calc(54.97807306752 * var(--u)))","fontWeight":600,"letterSpacing":"0.01em","lineHeight":"0.8750","textTransform":"uppercase","whiteSpace":"nowrap"},"children":["Building",["$","br",null,{}],"India’s Future"]}],["$","p",null,{"className":"msme-footer-abs","style":{"position":"absolute","left":"calc(652 * var(--u))","top":"calc(290.6 * var(--u))","margin":0,"fontFamily":"Arial, \"Helvetica Neue\", Helvetica, sans-serif","fontSize":"max(14.237915443199999px, calc(32.27260833792 * var(--u)))","lineHeight":1,"color":"#D6D5D4","whiteSpace":"nowrap"},"children":["2nd December 2026",["$","span",null,{"aria-hidden":"true","style":{"marginLeft":"calc(8 * var(--u))"},"children":"|"}],["$","span",null,{"style":{"marginLeft":"calc(19 * var(--u))"},"children":"Bengaluru, India"}]]}],["$","nav",null,{"aria-label":"Summit","className":"msme-footer-nav","children":[["$","$L10","/msme/about",{"href":"/msme/about","className":"msme-footer-abs","style":{"position":"absolute","left":"calc(1371 * var(--u))","top":"calc(130.7 * var(--u))","fontFamily":"Arial, \"Helvetica Neue\", Helvetica, sans-serif","fontSize":"max(12.75535872px, calc(24.529536 * var(--u)))","letterSpacing":"0.05em","lineHeight":1,"textTransform":"uppercase","color":"#AAA9AF","textDecoration":"none","whiteSpace":"nowrap"},"children":"About"}],["$","$L10","/msme/agenda",{"href":"/msme/agenda","className":"msme-footer-abs","style":{"position":"absolute","left":"calc(1864 * var(--u))","top":"calc(130.7 * var(--u))","fontFamily":"Arial, \"Helvetica Neue\", Helvetica, sans-serif","fontSize":"max(12.75535872px, calc(24.529536 * var(--u)))","letterSpacing":"0.05em","lineHeight":1,"textTransform":"uppercase","color":"#AAA9AF","textDecoration":"none","whiteSpace":"nowrap"},"children":"Agenda"}],["$","$L10","/msme/awards",{"href":"/msme/awards","className":"msme-footer-abs","style":{"position":"absolute","left":"calc(1372 * var(--u))","top":"calc(216.7 * var(--u))","fontFamily":"Arial, \"Helvetica Neue\", Helvetica, sans-serif","fontSize":"max(12.75535872px, calc(24.529536 * var(--u)))","letterSpacing":"0.05em","lineHeight":1,"textTransform":"uppercase","color":"#AAA9AF","textDecoration":"none","whiteSpace":"nowrap"},"children":"#Time2Leap Awards"}],["$","$L10","/msme/past-editions",{"href":"/msme/past-editions","className":"msme-footer-abs","style":{"position":"absolute","left":"calc(1865 * var(--u))","top":"calc(216.7 * var(--u))","fontFamily":"Arial, \"Helvetica Neue\", Helvetica, sans-serif","fontSize":"max(12.75535872px, calc(24.529536 * var(--u)))","letterSpacing":"0.05em","lineHeight":1,"textTransform":"uppercase","color":"#AAA9AF","textDecoration":"none","whiteSpace":"nowrap"},"children":"Past Editions"}],["$","$L10","/msme/faq",{"href":"/msme/faq","className":"msme-footer-abs","style":{"position":"absolute","left":"calc(1373 * var(--u))","top":"calc(301.7 * var(--u))","fontFamily":"Arial, \"Helvetica Neue\", Helvetica, sans-serif","fontSize":"max(12.75535872px, calc(24.529536 * var(--u)))","letterSpacing":"0.05em","lineHeight":1,"textTransform":"uppercase","color":"#AAA9AF","textDecoration":"none","whiteSpace":"nowrap"},"children":"FAQ"}],["$","$L10","/msme/contact",{"href":"/msme/contact","className":"msme-footer-abs","style":{"position":"absolute","left":"calc(1865 * var(--u))","top":"calc(301.7 * var(--u))","fontFamily":"Arial, \"Helvetica Neue\", Helvetica, sans-serif","fontSize":"max(12.75535872px, calc(24.529536 * var(--u)))","letterSpacing":"0.05em","lineHeight":1,"textTransform":"uppercase","color":"#AAA9AF","textDecoration":"none","whiteSpace":"nowrap"},"children":"Contact"}]]}],"$L2f","$L30","$L31","$L32"]}]}]}]
+22:["$","script","script-0",{"src":"/_next/static/chunks/04i0fco__01~y.js","async":true,"nonce":"$undefined"}]
+23:["$","script","script-1",{"src":"/_next/static/chunks/0h_t02-r1rjon.js","async":true,"nonce":"$undefined"}]
+24:["$","$L33",null,{"children":["$","$29",null,{"name":"Next.MetadataOutlet","children":"$@34"}]}]
+2b:["$","div",null,{"className":"msme-footer-abs","style":{"position":"absolute","left":"calc(5 * var(--u))","top":"calc(468 * var(--u))","fontSize":"max(12.52050176px, calc(28.8934656 * var(--u)))","fontWeight":350,"fontStretch":"81%","lineHeight":1,"color":"#ADADAD","textTransform":"uppercase","whiteSpace":"nowrap"},"children":[["$","$1","/privacy-policy",{"children":[["$","$L10",null,{"href":"/privacy-policy","style":{"color":"inherit","textDecoration":"none"},"children":"Privacy Policy"}],["$","span",null,{"aria-hidden":"true","children":" · "}]]}],["$","$1","/terms-of-service",{"children":[["$","$L10",null,{"href":"/terms-of-service","style":{"color":"inherit","textDecoration":"none"},"children":"Terms & Conditions"}],["$","span",null,{"aria-hidden":"true","children":" · "}]]}],["$","$1","/refund-policy",{"children":[["$","$L10",null,{"href":"/refund-policy","style":{"color":"inherit","textDecoration":"none"},"children":"Registration & Refund Policy"}],["$","span",null,{"aria-hidden":"true","children":" · "}]]}],["$","$1","/cookies-policy",{"children":[["$","$L10",null,{"href":"/cookies-policy","style":{"color":"inherit","textDecoration":"none"},"children":"Cookie Policy"}],false]}]]}]
+2c:["$","span",null,{"className":"msme-footer-abs","style":{"position":"absolute","left":"calc(1364 * var(--u))","top":"calc(422 * var(--u))"},"children":["$","div",null,{"style":{"position":"relative","width":"max(170px, calc(399 * var(--u)))","aspectRatio":"684 / 173","overflow":"hidden"},"children":["$","$L13",null,{"src":"/msme/logos/summentor-pro-white.webp","alt":"Organised by Summentor Pro","fill":true,"priority":false,"sizes":"(max-width: 640px) 100vw, (max-width: 1180px) 100vw, 1180px","style":{"objectFit":"contain"}}]}]}]
+2d:["$","span",null,{"aria-hidden":"true","className":"msme-footer-rule","style":{"position":"absolute","left":0,"top":"calc(605 * var(--u))","width":"calc(2080 * var(--u))","height":"max(1px, calc(5 * var(--u)))","background":"#FFFFFF"}}]
+2e:["$","p",null,{"className":"msme-footer-abs","style":{"position":"absolute","left":"calc(7 * var(--u))","top":"calc(693 * var(--u))","margin":0,"fontFamily":"Arial, \"Helvetica Neue\", Helvetica, sans-serif","fontSize":"max(12.52050176px, calc(28.8934656 * var(--u)))","fontWeight":700,"lineHeight":1,"textTransform":"uppercase","whiteSpace":"nowrap"},"children":["© 2026 ","Summentor Pro",". All rights reserved."]}]
+2f:["$","div",null,{"className":"msme-footer-abs","style":{"position":"absolute","left":"calc(5 * var(--u))","top":"calc(468 * var(--u))","fontSize":"max(12.52050176px, calc(28.8934656 * var(--u)))","fontWeight":350,"fontStretch":"81%","lineHeight":1,"color":"#ADADAD","textTransform":"uppercase","whiteSpace":"nowrap"},"children":[["$","$1","/privacy-policy",{"children":[["$","$L10",null,{"href":"/privacy-policy","style":{"color":"inherit","textDecoration":"none"},"children":"Privacy Policy"}],["$","span",null,{"aria-hidden":"true","children":" · "}]]}],["$","$1","/terms-of-service",{"children":[["$","$L10",null,{"href":"/terms-of-service","style":{"color":"inherit","textDecoration":"none"},"children":"Terms & Conditions"}],["$","span",null,{"aria-hidden":"true","children":" · "}]]}],["$","$1","/refund-policy",{"children":[["$","$L10",null,{"href":"/refund-policy","style":{"color":"inherit","textDecoration":"none"},"children":"Registration & Refund Policy"}],["$","span",null,{"aria-hidden":"true","children":" · "}]]}],["$","$1","/cookies-policy",{"children":[["$","$L10",null,{"href":"/cookies-policy","style":{"color":"inherit","textDecoration":"none"},"children":"Cookie Policy"}],false]}]]}]
+30:["$","span",null,{"className":"msme-footer-abs","style":{"position":"absolute","left":"calc(1364 * var(--u))","top":"calc(422 * var(--u))"},"children":["$","div",null,{"style":{"position":"relative","width":"max(170px, calc(399 * var(--u)))","aspectRatio":"684 / 173","overflow":"hidden"},"children":["$","$L13",null,{"src":"/msme/logos/summentor-pro-white.webp","alt":"Organised by Summentor Pro","fill":true,"priority":false,"sizes":"(max-width: 640px) 100vw, (max-width: 1180px) 100vw, 1180px","style":{"objectFit":"contain"}}]}]}]
+31:["$","span",null,{"aria-hidden":"true","className":"msme-footer-rule","style":{"position":"absolute","left":0,"top":"calc(605 * var(--u))","width":"calc(2080 * var(--u))","height":"max(1px, calc(5 * var(--u)))","background":"#FFFFFF"}}]
+32:["$","p",null,{"className":"msme-footer-abs","style":{"position":"absolute","left":"calc(7 * var(--u))","top":"calc(693 * var(--u))","margin":0,"fontFamily":"Arial, \"Helvetica Neue\", Helvetica, sans-serif","fontSize":"max(12.52050176px, calc(28.8934656 * var(--u)))","fontWeight":700,"lineHeight":1,"textTransform":"uppercase","whiteSpace":"nowrap"},"children":["© 2026 ","Summentor Pro",". All rights reserved."]}]
+27:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+35:I[12843,["/_next/static/chunks/08yb0vyff6txf.js","/_next/static/chunks/0nz2qlxv3r.27.js"],"IconMark"]
+2a:[["$","title","0",{"children":"Agenda | MSME & Startup Innovation Summit"}],["$","meta","1",{"name":"description","content":"Where India's growing businesses meet the people, ideas and opportunities shaping their next stage of growth. Hosted in Bengaluru. Built for India."}],["$","meta","2",{"name":"robots","content":"noindex, nofollow"}],["$","link","3",{"rel":"canonical","href":"https://msme.summentorpro.com/agenda/"}],["$","meta","4",{"property":"og:title","content":"MSME & Startup Innovation Summit — 6th Edition"}],["$","meta","5",{"property":"og:description","content":"Where India's growing businesses meet the people, ideas and opportunities shaping their next stage of growth. Hosted in Bengaluru. Built for India."}],["$","meta","6",{"property":"og:url","content":"https://msme.summentorpro.com/"}],["$","meta","7",{"property":"og:site_name","content":"MSME & Startup Innovation Summit"}],["$","meta","8",{"property":"og:locale","content":"en_IN"}],["$","meta","9",{"property":"og:type","content":"website"}],["$","meta","10",{"name":"twitter:card","content":"summary"}],["$","meta","11",{"name":"twitter:title","content":"MSME & Startup Innovation Summit — 6th Edition"}],["$","meta","12",{"name":"twitter:description","content":"Where India's growing businesses meet the people, ideas and opportunities shaping their next stage of growth. Hosted in Bengaluru. Built for India."}],["$","link","13",{"rel":"icon","href":"/msme/icon.png?icon.0z2-yyq5ssiwt.png","sizes":"256x256","type":"image/png"}],["$","link","14",{"rel":"apple-touch-icon","href":"/msme/apple-icon.png?apple-icon.15y5e2o5gy_qv.png","sizes":"180x180","type":"image/png"}],["$","$L35","15",{}]]
+34:null

@@ -1,0 +1,4 @@
+:HL["/_next/static/chunks/0u5cax1bxn2qo.css","style"]
+:HL["/_next/static/chunks/0y6gg2mgd4t0h.css","style"]
+:HL["/_next/static/media/21ca8f3f56c22ca2-s.p.0fmzj955937qe.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"msme","param":null,"prefetchHints":0,"slots":{"children":{"name":"faq","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}},"staleTime":300,"buildId":"9o5HJRKsN9O_brXZvGnI2"}
